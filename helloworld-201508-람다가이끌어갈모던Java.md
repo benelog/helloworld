@@ -778,9 +778,9 @@ StringAction f3 = s -> System.out.println ("!!" + s);
 ### 람다 표현식의 내부 구현
 Java에 새로운 함수 타입 체계를 도입하지 않은 이유는 내부 구현을 효율적으로 하기 위함도 있다. Java 언어의 아키텍트인 Brian Goetz에 따르면 JVM 차원의 표현 방식과 언어 차원의 표현에 거리가 생길수록 감당해야 하는 구현의 복잡함이 커지기 때문에 이를 피하려고 했다고 한다. ‘int 한 개를 파라미터로 받아 int를 반환’과 같은 함수 타입의 표현은 기존의 메서드 시그니처와 같은 방식으로는 할 수 없고, JVM에서도 현재 바이트코드 수준에서는 함수 시그니처를 표현할 수 있는 명세가 없다. 새로운 타입을 위한 체계를 추가하거나 이를 다른 방식으로 우회해서 표현하는 것이 JVM 내부의 복잡도를 높이고 코너 케이스[^n]를 만드는 등 여러 면에서 고충이 많을 것으로 예상했다.[^n]
 
-여기까지 본다면 Java의 람다는 앞에서 본 다른 JVM 언어가 그랬듯 익명 클래스의 생성을 축약한 것처럼 보인다. 그러나 람다는 익명 클래스를 생성하지 않는다. 컴파일된 소스 폴더나 역컴파일을 해도 익명 클래스의 흔적은 없다.
+여기까지 본다면 Java의 람다는 앞에서 본 다른 JVM 언어가 그랬듯 익명 클래스 선언 문법을 단순히 대체한 것처럼 보인다. 그러나 람다는 다른 JVM언어처럼 컴파일 타임에 익명 클래스를 생성하지 않는다. 컴파일된 소스 폴더나 역컴파일을 해도 익명 클래스의 흔적은 없다. 람다표현식은 익명클래스 문법과는 다른 바이트코드를 생성한다.
 
-우선 람다 표현식이 익명 클래스가 아니기 때문에 언어를 쓰는 사용자에게 가장 드러나는 차이는 this 키워드의 의미다. 예제 29는 Runnable 타입으로 참조하는 익명 클래스와 람다를 함께 생성한다. 익명 클래스와 람다 안에서 this가 Runnable을 구현했는지 여부를 true나 false로 출력했다.
+람다 표현식이 기존의 익명 클래스 문법과 다르기 떄문에 때문에 언어를 쓰는 사용자에게 우선 드러나는 차이는 this 키워드의 의미다. 예제 29는 Runnable 타입으로 참조하는 고전적인 방식의 익명 클래스와 람다를 함께 생성한다. 익명 클래스와 람다 안에서 this가 Runnable을 구현했는지 여부를 true나 false로 출력했다.
 
 <span class="caption">예제 29 익명 클래스와 람다에서 this의 차이([ThisDifference.java](https://github.com/benelog/lambda-resort/blob/master/src/main/java/com/naver/helloworld/basiclambda/ThisDifference.java))</span>
 
@@ -809,7 +809,7 @@ public class ThisDifference {
 }
 ```
 
-예제 29를 실행하면 true와 false를 차례로 출력한다. 즉 익명 클래스 내부에서 전달한 this는 Runnable을 구현한 익명 클래스 그 자체인데 반해 람다 표현식을 썼을 때는 익명 클래스가 아닌 것이다. 람다 표현식 안에서 선언한 this의 타입은 이를 생성한 클래스인 ThisDifference다. 익명 클래스 안에서 이를 생성한 객체를 전달하려면 `ThisDifference.this`처럼 직접 타입을 지정하면 된다. 정적 타입 언어인 Java에서는 this가 어떤 타입인지 혼동할 위험이 적지만 같은 코드라도 this가 들어가면 익명 클래스 안과 람다 안은 다른 의미라는 점은 인식해야 한다.
+예제 29를 실행하면 true와 false를 차례로 출력한다. 즉 익명 클래스 내부에서 전달한 this는 Runnable을 구현한 익명 클래스 그 자체인데 반해 람다 표현식을 썼을 때는 익명 클래스가 아닌 것이다. 람다 표현식 안에서 선언한 this의 타입은 이를 생성한 클래스인 ThisDifference다. 익명 클래스 안에서 이를 생성한 객체를 전달하려면 `ThisDifference.this`처럼 직접 타입을 지정하면 된다. 뒤에 나올 바이트코드 생성과정을 본다면 왜 이런 현상이 발생했는지 알수 있다. 정적 타입 언어인 Java에서는 this가 어떤 타입인지 혼동할 위험이 적지만 같은 코드라도 this가 들어가면 익명 클래스 안과 람다 안은 다른 의미라는 점은 인식해야 한다.
 
 참고로 IntelliJ에서는 익명 클래스로 선언된 코드 중 람다 표현식으로 교체할 수 있는 부분은 자동으로 리팩터링을 제안한다. 그런데 예제 29의 anonClass 변수처럼 this를 포함한 익명 클래스는 제안 대상에서 제외된다. ThisDifference.this와 같이 람다 표현식에서도 같은 의미일 때는 다음 그림과 같이 리팩터링을 추천한다.
 
@@ -819,9 +819,9 @@ public class ThisDifference {
 
 <span class="caption">그림 1 IntelliJ의 람다를 활용한 리팩터링 제안</span>
 
-이렇듯 람다 표현식은 익명 클래스와 다르다. 다른 JVM 언어처럼 람다 표현식을 익명 클래스로 바꾸는 것이 적절하고 쉬운 방법으로 보인다. 하지만 익명 클래스로는 매번 새로운 인스턴스를 생성하고 단순한 바이트코드 명세로 표현되지 않는 등의 단점이 있다. JVM 개발자는 기존의 익명 클래스보다 성능면에서 더 유리하고 JVM 바이트코드로도 깔끔하게 연결되는 방법을 찾으려고 했다.
+이렇듯 람다 표현식은 이전의 익명 클래스와 다르다. 다른 JVM 언어처럼 람다 표현식을 익명 클래스 문법으로 치환하는 것이 적절하고 쉬운 방법으로 보인다. 하지만 그런 익명 클래스로는 매번 새로운 인스턴스를 생성하고 단순한 바이트코드 명세로 표현되지 않는 등의 단점이 있다. JVM 개발자는 기존의 익명 클래스보다 성능면에서 더 유리하고 JVM 바이트코드로도 깔끔하게 연결되는 방법을 찾으려고 했다.
 
-결과적으로 Java 8에서 람다 표현식은 invokedynamic이라는 바이트코드로 변환된다. Java의 역어셈블러(disassembler)인 javap로 이를 확인했다. 예제 30은 단순하게 람다 표현식으로 Runnable 인터페이스의 인스턴스를 생성했다.
+결과적으로 Java 8에서 람다 표현식으로 객체를 생성하는 코드는 invokedynamic이라는 바이트코드로 변환된다. Java의 역어셈블러(disassembler)인 javap로 이를 확인했다. 예제 30은 단순하게 람다 표현식으로 Runnable 인터페이스의 인스턴스를 생성했다.
 
 <span class="caption">예제 30 간단한 람다 활용 예제([SimpleLambda.java](https://github.com/benelog/lambda-resort/blob/master/src/main/java/com/naver/helloworld/basiclambda/SimpleLambda.java))</span>
 
@@ -861,7 +861,10 @@ public class com.naver.helloworld.resort.SimpleLambda {
 }
 ```
 
+즉, 람다표현식으로 객체를 생성하는 코드는 invokedynamic으로 변환되었다. invokedynamic은 람다표현식으로 반환될 인터페이스를 구현한 클래스를 동적으로 정의하고 인스턴스를 생성해서 반환해준다. 생성된 객체를 실행하는 `lambda.run()`은 invokeinterface로 치환되었다. 인터페이스인 `Runnable`로 참조된 객체이므로 두번째 과정은 자연스러워보인다.
+
 원래 invokedynamic은 Java 언어가 아닌 JRuby, Jython, Groovy와 같은 동적 타입 언어를 위한 명세였다. 동적 타입 언어는 컴파일 시점에 타입이 확정되지 않은 메서드를 런타임에 호출할 수 있는데 이를 효율적으로 지원하기 위해 Java 7부터 invokedynamic 명세가 포함됐다. 람다 표현식에서 이를 활용하면서 더 이상 이 명세는 동적 타입 언어만을 위한 것이 아니게 됐다. 참고로 Java에서 트랜잭션 처리와 같은 반복적인 코드를 없애는 데 많이 사용하는 AOP(aspect oriented progmramming)를 구현하는 기술에서도 invokedynamic을 활용하려는 시도가 보인다.[^n]
+
 
 invokedynamic 호출은 Bootstrap 메서드, 정적 파라미터 목록, 동적 파라미터 목록 등 세 가지 정보를 필요로 한다. Bootstrap 메서드는 호출 대상을 찾아서 연결하고 invokedynamic을 쓰는 메서드가 처음 호출될 때만 실행된다. 정적 파라미터는 상수풀(constant pool)에 저장된 정보다. 동적 파라미터는 메서드의 런타임에서 참조할 수 있는 변수인데 람다 표현식으로 치면 클로저로 쓰였을 때의 자유 변수가 이에 해당한다.
 
@@ -876,7 +879,10 @@ BootstrapMethods:
     #55 ()V
 ```
 
-그다음으로 눈에 띄는 점은 private static 메서드가 추가된 것이다. 람다 표현식 안에서 구현한 코드가 그대로 lambda$0() 메서드로 옮겨가 있다. 람다 표현식 안에서 일부러 예외를 발생해 콜 스택에서 SimpleLambda.lambda$0 메서드와 같은 흔적을 발견할 수 있다.
+결국 람다표현식으로 선언된 객체를 어떻게 생성할지는 `LambdaMetafactory.metafactory()`메서드를 통해 실행시점에 결정한다. 이렇게 람다표현식의 해석을 컴파일시점이 아닌 실행시점으로 미뤘기 때문에 앞으로 나올 JDK에서도 더 유연하게 최적화를 할 수 있다.
+
+
+그다음으로 눈에 띄는 점은 private static 메서드가 추가된 것이다. 람다 표현식 안에서 구현한 코드가 그대로 lambda$0() 메서드로 옮겨가 있다. 람다 표현식 안에서 일부러 예외를 발생해 콜 스택에서 SimpleLambda.lambda$0 메서드와 같은 흔적을 발견할 수 있다. 예제 29에서 람다표현식 안에서 참조한 this가 `Runnable`의 구현체가 아니였던 이유는 이 과정 때문이다.
 
 예제 30을 바이트코드에 가깝게 다시 쓰면 다음과 같다. invokedynamic의 호출 대상이 되는 인스턴스를 생성하는 정보는 Bootstrap 메서드(LambdaMetafactory)와 정적 파라미터 목록인 staticargs(Runnable과 lambda$0)로 전달했다. 람다 표현식 안에서 자유 변수를 참조한다면 동적 파라미터 목록인 dynargs에도 정보가 들어갔을 테지만 이 예제는 그 경우에 해당하지 않는다.
 
@@ -895,13 +901,17 @@ public class SimpleLambda {
 }
 ```
 
+조금더 내부를 들여다보면 `LambdaMetafactory`는 `java.lang.invoke.CallSite` 객체를 반환한다. `CallSite`는 `java.lang.invoke.MethodHandle`형의 객체를 맴버변수로 참조한다. `MethodHandle`는 람다의 내부 내용을 옮긴 private 메서드로 연결된다.
+
+참고로 java 프로세스를 실행할 때 `-Djdk.internal.lambda.dumpProxyClasses` 옵션을 붙이면 람다표현식으로 생성하는 동적클래스를 파일로 저장해준다. 예제 30도 `java -Djdk.internal.lambda.dumpProxyClasses SimpleLambda`와 같이 생성하면 실행한 디렉토리에 SimpleLambda$$Lambda$1.class가 생성된 것을 확인할 수 있다.
+
 invokedynamic을 이용한 람다 표현식은 성능과 자원 사용면에서 효율적이다. 해당 코드 블럭이 처음 호출되기 전까지는 초기화를 하지 않는다. 따라서 익명 함수가 생성됐어도 실 제로 호출되지 않았다면 힙 메모리를 사용하지 않는다. 외부 변수를 참조하지 않는, 상태가 없는 익명 함수는 인스턴스를 하나만 생성해 다시 반환한다. 결과적으로 상태 없는 익명 함수를 생성하는 실험 케이스에서는 익명 클래스를 쓸 때에 비해 1/67의 인스턴스 생성 비용(capturing cost)이 들었다고 한다.[^n] 그리고 앞으로 최적화 여지도 많이 있다고 하니 더욱 성능이 개선될 것으로 기대된다.
 
 문법으로 람다 표현식을 지원하는 데는 다른 JVM 언어보다 몇 년이나 뒤처졌던 Java 언어가 Java 8 발표 시점에서는 성능과 자원의 효율성에서는 가장 앞서게 됐다는 점도 흥미롭다. Scala에서도 람다 표현식을 invokedynamic으로 변환하는 기능이 2.11.6 버전에 추가될 예정이다.[^n] 다른 언어에서도 비슷한 시도를 할 것으로 예상된다.
 
 람다 표현식을 쓴 코드를 Java 6과 Java 7에서도 실행할 수 있도록 컴파일하는 [Retrolambda](https://github.com/orfjackal/retrolambda)라는 프로젝트도 있다. Maven이나 Gradle의 플러그인으로 설정하면 익명 클래스를 생성하는 방식으로 람다 표현식을 컴파일한다. Guava 같은 라이브러리를 쓰고 Retrolambda로 컴파일하면 클래식 Java 환경에서도 모던 Java를 맛볼 수 있다. Java 8의 문법을 지원하지 않는 Android 환경에서도 활용할 만하다. Functional Java 라이브러리에서 이를 활용했다.
 
-정리하자면 Java의 람다 표현식은 밖에서 보기에는 인터페이스에 기대어 최소한의 변화를 추구했지만 내부적으로는 익명 클래스를 생성하는 방식보다는 더 성능이 좋도록 개선했고 그 과정에서 기존의 JVM 명세였던 invokedynamic을 활용했다. 최대한 안정된 기반을 활용하면서도 내부적인 효율을 추구한 면이 Java답다.
+정리하자면 Java의 람다 표현식은 밖에서 보기에는 인터페이스에 기대어 최소한의 변화를 추구했다. 반면 내부적으로는 기존의 익명 클래스보다 더 성능이 좋도록 개선했다. 그 과정에서 기존의 JVM 명세였던 invokedynamic을 활용했다. 최대한 안정된 기반을 활용하면서도 내부적인 효율을 개선한 면이 Java답다.
 
 ### 애플리케이션 코드의 개선
 지금까지는 컬렉션과 관련된 코드 위주로 람다를 적용할 수 있는 예를 살펴봤다. 그 외에도 폭넓은 곳에 람다 표현식을 적용해 코드를 개선할 수 있다.
