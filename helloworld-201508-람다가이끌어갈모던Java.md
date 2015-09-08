@@ -879,7 +879,7 @@ BootstrapMethods:
     #55 ()V
 ```
 
-결국 람다표현식으로 선언된 객체를 어떻게 생성할지는 `LambdaMetafactory.metafactory()`메서드를 통해 실행시점에 결정한다. 이렇게 람다표현식의 해석을 컴파일시점이 아닌 실행시점으로 미뤘기 때문에 앞으로 나올 JDK에서도 더 유연하게 최적화를 할 수 있다.
+결국 람다표현식으로 선언된 객체를 어떻게 생성할지는 `LambdaMetafactory.metafactory()`메서드를 통해 실행시점에 결정한다. 이렇게 람다표현식의 해석을 컴파일시점이 아닌 실행시점으로 미뤘기 때문에 앞으로 나올 JDK에서도 더 유연하게 최적화를 할 수 있다. [^n]
 
 
 그다음으로 눈에 띄는 점은 private static 메서드가 추가된 것이다. 람다 표현식 안에서 구현한 코드가 그대로 lambda$0() 메서드로 옮겨가 있다. 람다 표현식 안에서 일부러 예외를 발생해 콜 스택에서 SimpleLambda.lambda$0 메서드와 같은 흔적을 발견할 수 있다. 예제 29에서 람다표현식 안에서 참조한 this가 `Runnable`의 구현체가 아니였던 이유는 이 과정 때문이다.
@@ -1200,6 +1200,8 @@ Java 8의 변화는 Java 언어에서 제2차 혁명이라 할 만하다. 1차 �
 [^n]: Brian Goetz, "Lambda: A Peek Under the Hood", http://www.infoq.com/presentations/lambda-invokedynamic.
 
 [^n]: Java 바이트코드 분석에 관해서는 "[JVM Internal](http://d2.naver.com/helloworld/1230)"을 참고한다.
+
+[^n]: 자세한 내용은 [Translation of Lambda Expressions](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)의  Translation strategy 절을 참고한다.
 
 [^n]: Antoine Sabot-Durand, "Invoke dynamite in Java EE with invoke dynamic", http://www.slideshare.net/antoinesd/invoke-dynamite-with-invoke-dynamic.
 
