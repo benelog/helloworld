@@ -371,7 +371,7 @@ Java 외에도 JVM에서 실행되는 언어가 있다. 이런 JVM 언어는 앞
 
 <span class="caption">예제 13 Groovy를 활용한 ResortService 인터페이스의 구현체([GroovyResort.groovy](https://github.com/benelog/lambda-resort/blob/master/src/main/groovy/com/naver/helloworld/resort/service/GroovyResort.groovy))</span>
 
-```java
+```groovy
 List<String> findGuestNamesByCompany(String company) {
     List<Guest> all = repository.findAll()
     all.findAll { g -> g.company == company }
@@ -386,7 +386,7 @@ Groovy에서는 return 키워드를 생략해도 자동으로 메서드의 반�
 
 <span class="caption">예제 14 Groovy의 it 키워드 활용([GroovyAdvancedResort.groovy](https://github.com/benelog/lambda-resort/blob/master/src/main/groovy/com/naver/helloworld/resort/service/GroovyAdvancedResort.groovy))</span>
 
-```java
+```groovy
 all.findAll { it.company == company }
     .sort { it.grade }
     .collect { it.name }
@@ -408,7 +408,7 @@ Scala는 함수형 언어의 특징을 적극적으로 도입한 JVM 언어로 �
 
 <span class="caption">예제 15 Scala를 활용한 ResortService 인터페이스의 구현체([ScalaResort.scala](https://github.com/benelog/lambda-resort/blob/master/src/main/scala/com/naver/helloworld/resort/service/ScalaResort.scala))</span>
 
-```java
+```scala
 import scala.collection.JavaConversions._
 
 // 클래스 선언부 등 생략
@@ -428,7 +428,7 @@ Groovy의 `it`과 유사하게 Scala에서는 `_` 기호로 파라미터가 한 
 
 <span class="caption">예제 16 Scala의 `_` 기호 이용([ScalaAdvancedResort.scala](https://github.com/benelog/lambda-resort/blob/master/src/main/scala/com/naver/helloworld/resort/service/ScalaAdvancedResort.scala))</span>
 
-```java
+```scala
 all.filter ( _.getCompany == company)
     .sortBy ( _.getGrade )
     .map ( _.getName )
@@ -436,7 +436,7 @@ all.filter ( _.getCompany == company)
 
 Scala도 마찬가지로 컴파일된 디렉터리에서 익명 클래스로 생성된 흔적이 보인다. 파일명에 익명 함수를 의미하는 `anonfun`이라는 문자열이 포함돼 있다.
 
-```java
+```
 ScalaResort.class
 ScalaResort$$anonfun$findGuestNamesByCompany$1.class
 ScalaResort$$anonfun$findGuestNamesByCompany$2.class
@@ -450,7 +450,7 @@ ScalaResort$$anonfun$findGuestNamesByCompany$3.class
 
 <span class="caption">예제 17 Kotlin을 활용한 ResortService 인터페이스의 구현체([KotlinResort.kt](https://github.com/benelog/lambda-resort/blob/master/src/main/kotlin/com/naver/helloworld/resort/service/KotlinResort.kt))</span>
 
-```java
+```kotlin
 override fun findGuestNamesByCompany(company: String): List<String> {
     val all = repository.findAll()
     return all.filter { g -> g.getCompany() == company }
@@ -463,7 +463,7 @@ Groovy처럼 `it` 키워드로 파라미터가 한 개인 익명 함수를 간�
 
 <span class="caption">예제 18 Kotlin의 it 키워드 활용([KotlinAdvancedResort.kt](https://github.com/benelog/lambda-resort/blob/master/src/main/kotlin/com/naver/helloworld/resort/service/KotlinAdvancedResort.kt))</span>
 
-```java
+```kotlin
 return all.filter { it.getCompany() == company }
     .sortBy { it.getGrade() }
     .map { it.getName() }
@@ -471,7 +471,7 @@ return all.filter { it.getCompany() == company }
 
 Kotlin의 익명 함수는 일부만 익명 클래스로 컴파일된다. 역컴파일해서 소스를 확인하니 필터링과 변환 로직은 같은 for 루프를 추가하는 방식으로 컴파일되고 sort 로직만 Comparator 인터페이스를 구현한 익명 클래스를 생성했다. 컴파일된 디렉터리에는 다음과 같은 파일이 생성돼 있다.
 
-```java
+```
 KotlinResort.class
 KotlinResort$findGuestNamesByCompany$$inlined$sortBy$1.class
 ```
@@ -483,7 +483,7 @@ KotlinResort$findGuestNamesByCompany$$inlined$sortBy$1.class
 
 <span class="caption">예제 19 Xtend를 활용한 ResortService 인터페이스의 구현체([XtendResort.xtend](https://github.com/benelog/lambda-resort/blob/master/src/main/xtend/com/naver/helloworld/resort/service/XtendResort.xtend))</span>
 
-```java
+```xtend
 override findGuestNamesByCompany(String company) {
     val all = repository.findAll()
     all.filter [g | g.company == company ]
@@ -496,7 +496,7 @@ override findGuestNamesByCompany(String company) {
 
 <span class="caption">예제 20 Xtend에서 함수 파라미터를 생략한 익명 함수 정의([XtendAdvancedResort.xtend](https://github.com/benelog/lambda-resort/blob/master/src/main/xtend/com/naver/helloworld/resort/service/XtendAdvancedResort.xtend))</span>
 
-```java
+```xtend
 override findGuestNamesByCompany(String aCompany) {
     val all = repository.findAll()
 
@@ -517,7 +517,7 @@ Ceylon에는 자체적인 String, List 타입이 있기 때문에 원래 Java의
 
 <span class="caption">예제 21 Ceylon을 활용한 ResortService 인터페이스의 구현체([resort.ceylon](https://github.com/benelog/lambda-resort/blob/master/src/main/ceylon/com/naver/helloworld/resort/service/resort.ceylon))</span>
 
-```java  
+```ceylon  
 import ceylon.interop.java { CeylonIterable }
 import java.util {JList = List, JArrayList = ArrayList }
 import java.lang {JString = String}
@@ -541,7 +541,7 @@ import java.lang {JString = String}
 
 마찬가지로 다음과 같은 파일 목록으로 익명 함수가 익명 클래스로 변환된 것을 확인할 수 있다.
 
-```java
+```
 CeylonResort.class
 CeylonResort$1.class
 CeylonResort$2.class
@@ -1090,7 +1090,7 @@ private <T> JinqStream<T> stream(Class<T> clazz) {
 
 예제 39를 실행하면 생성된 SQL을 로그 메시지로 확인할 수 있다. 예제 코드 저장소의 JinqServiceRun.java 파일에서 main() 메서드를 실행하면 표준 출력으로 로그 메시지가 출력된다.
 
-```java
+```sql
 Hibernate: select guest0_.id as id1_0_, guest0_.company as company2_0_, guest0_.grade as grade3_0_, guest0_.name as name4_0_ from guest guest0_ where guest0_.company=? order by guest0_.grade ASC limit ?
 ```
 
